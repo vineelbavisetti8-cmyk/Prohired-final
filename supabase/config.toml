@@ -1,0 +1,19 @@
+project_id = "qjjiyfqtnebqxipbsjqr"
+
+[functions.analyze-resume]
+verify_jwt = false
+
+[functions.interview-questions]
+verify_jwt = false
+
+[functions.jobs-search]
+verify_jwt = false
+
+[functions.improve-section]
+verify_jwt = false
+
+[functions.razorpay-create-order]
+verify_jwt = false
+
+[functions.razorpay-verify-payment]
+verify_jwt = false

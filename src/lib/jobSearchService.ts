@@ -33,6 +33,7 @@ const GROQ_MODELS = [
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 
 /** Adzuna Live Job Search API credentials */
+export const ADZUNA_APP_ID = "e62bb410";
 export const ADZUNA_APP_KEY = "629acfd5bde2e3f3a5f871dc7ef22361";
 
 function stripHtml(s: string): string {
@@ -47,47 +48,70 @@ function buildApplyUrl(title: string, company: string, location: string): string
 /**
  * Fetch live vacancies directly from Adzuna API (India / Global)
  */
-async function fetchAdzunaLiveJobs(role: string, location: string): Promise<JobItem[]> {
+async function fetchAdzunaLiveJobs(
+  role: string,
+  location: string,
+  resultsPerPage = 20
+): Promise<JobItem[]> {
   try {
+    // Use hardcoded credentials; also allow overrides via env / localStorage
     const appId =
-      (typeof localStorage !== "undefined" && localStorage.getItem("prohired_adzuna_app_id")) ||
       (import.meta as any).env?.VITE_ADZUNA_APP_ID ||
-      "";
+      (typeof localStorage !== "undefined" && localStorage.getItem("prohired_adzuna_app_id")) ||
+      ADZUNA_APP_ID;
 
-    if (!appId || !ADZUNA_APP_KEY) return [];
+    const appKey =
+      (import.meta as any).env?.VITE_ADZUNA_APP_KEY ||
+      ADZUNA_APP_KEY;
+
+    const searchRole = role || "software engineer";
+    const searchLocation = location || "India";
 
     const params = new URLSearchParams({
       app_id: appId,
-      app_key: ADZUNA_APP_KEY,
-      results_per_page: "15",
-      max_days_old: "7",
+      app_key: appKey,
+      results_per_page: String(resultsPerPage),
+      max_days_old: "14",
       "content-type": "application/json",
+      what: searchRole,
+      where: searchLocation,
     });
-    if (role) params.set("what", role);
-    if (location) params.set("where", location);
 
-    const country = location.toLowerCase().includes("us") ? "us" : "in";
-    const res = await fetch(`https://api.adzuna.com/v1/api/jobs/${country}/search/1?${params.toString()}`);
-    if (!res.ok) return [];
+    const country = searchLocation.toLowerCase().includes("us") ? "us" : "in";
+    const res = await fetch(
+      `https://api.adzuna.com/v1/api/jobs/${country}/search/1?${params.toString()}`
+    );
+    if (!res.ok) {
+      console.warn("Adzuna API returned", res.status, res.statusText);
+      return [];
+    }
 
     const data = await res.json();
     if (Array.isArray(data.results) && data.results.length > 0) {
       return data.results.map((j: any) => ({
         id: `adzuna_${j.id}`,
-        title: j.title ? stripHtml(j.title) : role,
+        title: j.title ? stripHtml(j.title) : searchRole,
         company: j.company?.display_name || "Adzuna Hiring Partner",
-        location: j.location?.display_name || (location || "India"),
+        location: j.location?.display_name || searchLocation,
         salaryMin: j.salary_min ?? null,
         salaryMax: j.salary_max ?? null,
         salary:
           j.salary_min && j.salary_max
             ? `₹${(j.salary_min / 100000).toFixed(1)}L – ₹${(j.salary_max / 100000).toFixed(1)}L`
+            : j.salary_min
+            ? `₹${(j.salary_min / 100000).toFixed(1)}L+`
             : "Competitive compensation",
         matchScore: 90 + Math.floor(Math.random() * 8),
-        tags: [role || "Engineering", "Live Vacancy", "Verified"],
-        posted: "Recently posted",
-        description: stripHtml(j.description || "").slice(0, 280),
-        applyUrl: j.redirect_url || buildApplyUrl(j.title, j.company?.display_name || "", j.location?.display_name || ""),
+        tags: [searchRole, "Live Vacancy", "Verified"],
+        posted: j.created ? new Date(j.created).toLocaleDateString("en-IN", { day: "numeric", month: "short" }) : "Recently posted",
+        description: stripHtml(j.description || "").slice(0, 300),
+        applyUrl:
+          j.redirect_url ||
+          buildApplyUrl(
+            j.title || searchRole,
+            j.company?.display_name || "",
+            j.location?.display_name || ""
+          ),
         experience: "2-5 years",
         employmentType: "Full-time",
       }));
@@ -434,8 +458,16 @@ export async function searchJobOpenings(
   const normLoc = locationQuery.trim().toLowerCase();
   const normFilter = filterTag.toLowerCase();
 
-  // 1. Filter local curated tech openings
-  let matched = CURATED_TECH_JOBS.filter((j) => {
+  // ── 1. Fetch LIVE vacancies from Adzuna API (primary source) ──────────────
+  let adzunaJobs: JobItem[] = [];
+  try {
+    adzunaJobs = await fetchAdzunaLiveJobs(queryRole || normFilter, locationQuery, 20);
+  } catch (err) {
+    console.warn("Adzuna live search notice:", err);
+  }
+
+  // ── 2. Filter local curated tech openings (secondary / fallback) ─────────
+  let curatedMatched = CURATED_TECH_JOBS.filter((j) => {
     // Filter by tag if selected
     if (normFilter !== "all") {
       const hasTag = j.tags?.some((t) => t.toLowerCase().includes(normFilter));
@@ -467,35 +499,27 @@ export async function searchJobOpenings(
 
   // Calculate dynamic match scores based on search query
   if (normQuery) {
-    matched = matched.map((j) => {
+    curatedMatched = curatedMatched.map((j) => {
       let score = j.matchScore || 85;
       if (j.title.toLowerCase().includes(normQuery)) score = Math.min(99, score + 6);
       if (j.company.toLowerCase().includes(normQuery)) score = Math.min(99, score + 8);
       return { ...j, matchScore: score };
     });
-    // Sort by match score descending
-    matched.sort((a, b) => (b.matchScore ?? 80) - (a.matchScore ?? 80));
+    curatedMatched.sort((a, b) => (b.matchScore ?? 80) - (a.matchScore ?? 80));
   }
 
-  // 2. Fetch live vacancies from Adzuna API if configured
-  try {
-    const adzunaLive = await fetchAdzunaLiveJobs(queryRole, locationQuery);
-    if (adzunaLive && adzunaLive.length > 0) {
-      const existingTitles = new Set(matched.map((m) => m.title.toLowerCase()));
-      const uniqueAdzuna = adzunaLive.filter((a) => !existingTitles.has(a.title.toLowerCase()));
-      matched = [...uniqueAdzuna, ...matched];
-    }
-  } catch (err) {
-    console.warn("Adzuna live search notice:", err);
-  }
+  // ── 3. Merge: Adzuna live results first, then non-duplicate curated ───────
+  const adzunaTitles = new Set(adzunaJobs.map((a) => a.title.toLowerCase()));
+  const uniqueCurated = curatedMatched.filter(
+    (c) => !adzunaTitles.has(c.title.toLowerCase())
+  );
+  let matched = [...adzunaJobs, ...uniqueCurated];
 
-  // 3. If matched results is low (< 3) and user provided a custom search query,
-  // invoke Groq AI to dynamically generate realistic matching live vacancies!
+  // ── 4. If still low results, invoke Groq AI to fill the gap ─────────────
   if (matched.length < 3 && normQuery) {
     try {
       const aiJobs = await generateJobsWithGroq(queryRole, locationQuery);
       if (aiJobs && aiJobs.length > 0) {
-        // Deduplicate against existing matched IDs
         const existingTitles = new Set(matched.map((m) => m.title.toLowerCase()));
         for (const aj of aiJobs) {
           if (!existingTitles.has(aj.title.toLowerCase())) {
@@ -508,7 +532,7 @@ export async function searchJobOpenings(
     }
   }
 
-  // If still empty (e.g. niche query returned 0 matches), return all curated jobs with computed match tags
+  // ── 5. Hard fallback: return curated jobs if everything else failed ───────
   if (matched.length === 0) {
     return CURATED_TECH_JOBS.slice(0, 10).map((j) => ({
       ...j,

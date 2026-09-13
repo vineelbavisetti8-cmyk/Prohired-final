@@ -25,13 +25,14 @@ import { Button } from "@/components/ui/button";
 import { ProUpgradeDialog } from "@/components/ProGate";
 import logo from "@/assets/prohired-logo.png";
 
-const NAV_ITEMS = [
+const DESKTOP_NAV = [
   { to: "/app/explore", label: "Cockpit", icon: Compass },
   { to: "/app/resume/upload", label: "ATS Studio", icon: Sparkles },
   { to: "/app/jobs", label: "Jobs", icon: Briefcase },
   { to: "/app/interview", label: "Interview", icon: MessageSquare },
   { to: "/app/profile", label: "Account", icon: User },
 ];
+const NAV_ITEMS = DESKTOP_NAV;
 
 interface AppHeaderProps {
   deviceMode: "phone" | "tablet" | "full";

@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import type { ResumeRecord, JobMatch } from "@/types";
 import { isValidUuid } from "@/lib/utils";
 import { searchJobOpenings } from "@/lib/jobSearchService";
+import { Skeleton } from "@/components/ui/skeleton";
 
 /* ─── Types ─────────────────────────────────────────────────────────────── */
 interface FeedJob {

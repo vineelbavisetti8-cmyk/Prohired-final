@@ -11,6 +11,7 @@ import {
   Loader2,
   ArrowRight,
   ShieldCheck,
+  AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -129,18 +130,18 @@ export default function Register() {
 
   return (
     <AuthShell
-      title="Create Your Account"
-      subtitle="Join thousands of ambitious professionals elevating their careers with ProHired AI."
+      title="Create Account"
+      subtitle="Join ambitious professionals elevating their careers with ProHired AI."
     >
-      <div className="space-y-5">
+      <div className="space-y-4 sm:space-y-5">
         {/* Google One-Click Sign Up */}
         <GoogleAuthButton
           label="Sign up with Google"
           onSuccess={() => nav("/app/dashboard", { replace: true })}
         />
 
-        {/* Divider */}
-        <div className="relative flex items-center justify-center">
+        {/* Crisp Divider */}
+        <div className="relative flex items-center justify-center py-0.5">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t border-gray-200" />
           </div>
@@ -149,22 +150,22 @@ export default function Register() {
           </span>
         </div>
 
-        {/* Auth Method Switcher Tabs */}
-        <div className="flex rounded-xl bg-gray-100 p-1 border border-gray-200">
+        {/* Mobile Responsive Auth Method Switcher Tabs */}
+        <div className="grid grid-cols-2 rounded-xl bg-gray-100 p-1 border border-gray-200/80">
           <button
             type="button"
             onClick={() => {
               setAuthMethod("email");
               setError(null);
             }}
-            className={`flex-1 flex items-center justify-center gap-2 rounded-lg py-2 text-xs font-semibold transition-all ${
+            className={`flex items-center justify-center gap-1.5 xs:gap-2 rounded-lg py-2.5 px-2 text-xs font-bold transition-all ${
               authMethod === "email"
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-500 hover:text-gray-700"
+                ? "bg-white text-gray-900 shadow-xs ring-1 ring-black/5"
+                : "text-gray-500 hover:text-gray-900"
             }`}
           >
-            <Mail className="h-3.5 w-3.5" />
-            <span>Email & Password</span>
+            <Mail className="h-3.5 w-3.5 shrink-0 text-orange-500" />
+            <span className="truncate">Email & Password</span>
           </button>
           <button
             type="button"
@@ -172,79 +173,86 @@ export default function Register() {
               setAuthMethod("phone");
               setError(null);
             }}
-            className={`flex-1 flex items-center justify-center gap-2 rounded-lg py-2 text-xs font-semibold transition-all ${
+            className={`flex items-center justify-center gap-1.5 xs:gap-2 rounded-lg py-2.5 px-2 text-xs font-bold transition-all ${
               authMethod === "phone"
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-500 hover:text-gray-700"
+                ? "bg-white text-gray-900 shadow-xs ring-1 ring-black/5"
+                : "text-gray-500 hover:text-gray-900"
             }`}
           >
-            <Sparkles className="h-3.5 w-3.5 text-orange-500" />
-            <span>Instant Phone</span>
+            <Sparkles className="h-3.5 w-3.5 shrink-0 text-orange-500" />
+            <span className="truncate">Instant Phone</span>
           </button>
         </div>
 
         {authMethod === "email" ? (
           /* Email & Password Registration Form */
-          <form onSubmit={onEmailSubmit} className="space-y-4">
+          <form onSubmit={onEmailSubmit} className="space-y-3.5 sm:space-y-4">
             <div className="space-y-1.5">
               <Label
                 htmlFor="regFullName"
-                className="text-xs uppercase font-semibold text-gray-600 tracking-wider flex items-center gap-1.5"
+                className="text-xs font-semibold text-gray-700 flex items-center gap-1.5"
               >
-                <User className="h-3.5 w-3.5 text-orange-600" /> Full Name
+                <User className="h-3.5 w-3.5 text-orange-500" /> Full Name
               </Label>
               <Input
                 id="regFullName"
                 type="text"
+                autoComplete="name"
+                autoCapitalize="words"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="e.g. Priya Sharma"
                 required
-                autoFocus
-                className="h-11 border-gray-200 bg-white/80 text-gray-900 focus-visible:ring-orange-500 rounded-xl"
+                className="h-12 border-gray-200 bg-white/90 text-base text-gray-900 placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-orange-500/20 focus-visible:border-orange-500 rounded-xl"
               />
             </div>
 
             <div className="space-y-1.5">
               <Label
                 htmlFor="regEmail"
-                className="text-xs uppercase font-semibold text-gray-600 tracking-wider flex items-center gap-1.5"
+                className="text-xs font-semibold text-gray-700 flex items-center gap-1.5"
               >
-                <Mail className="h-3.5 w-3.5 text-orange-600" /> Email Address
+                <Mail className="h-3.5 w-3.5 text-orange-500" /> Email Address
               </Label>
               <Input
                 id="regEmail"
                 type="email"
+                inputMode="email"
+                autoComplete="email"
+                autoCapitalize="none"
+                spellCheck="false"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="priya@example.com"
+                placeholder="name@example.com"
                 required
-                className="h-11 border-gray-200 bg-white/80 text-gray-900 focus-visible:ring-orange-500 rounded-xl"
+                className="h-12 border-gray-200 bg-white/90 text-base text-gray-900 placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-orange-500/20 focus-visible:border-orange-500 rounded-xl"
               />
             </div>
 
             <div className="space-y-1.5">
               <Label
                 htmlFor="regPassword"
-                className="text-xs uppercase font-semibold text-gray-600 tracking-wider flex items-center gap-1.5"
+                className="text-xs font-semibold text-gray-700 flex items-center gap-1.5"
               >
-                <Lock className="h-3.5 w-3.5 text-orange-600" /> Password
+                <Lock className="h-3.5 w-3.5 text-orange-500" /> Password
               </Label>
               <div className="relative">
                 <Input
                   id="regPassword"
                   type={showPassword ? "text" : "password"}
+                  autoComplete="new-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="At least 6 characters"
                   required
                   minLength={6}
-                  className="h-11 pr-10 border-gray-200 bg-white/80 text-gray-900 focus-visible:ring-orange-500 rounded-xl"
+                  className="h-12 pr-12 border-gray-200 bg-white/90 text-base text-gray-900 placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-orange-500/20 focus-visible:border-orange-500 rounded-xl"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10 flex items-center justify-center text-gray-400 hover:text-gray-700 active:scale-95 transition-colors"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -252,14 +260,15 @@ export default function Register() {
             </div>
 
             {error && (
-              <div className="rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-xs text-rose-700 font-medium">
-                {error}
+              <div className="flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50/90 p-3 text-xs text-rose-700 font-medium">
+                <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-rose-600" />
+                <span className="leading-snug">{error}</span>
               </div>
             )}
 
             <Button
               type="submit"
-              className="w-full h-11 text-xs uppercase tracking-wider font-bold gap-2 bg-orange-500 hover:bg-orange-600 text-white shadow-glow-primary rounded-xl"
+              className="w-full h-12 text-sm font-bold uppercase tracking-wider gap-2 bg-orange-500 hover:bg-orange-600 active:scale-[0.98] text-white shadow-glow-primary rounded-xl transition-all"
               disabled={submitting}
             >
               {submitting ? (
@@ -276,58 +285,74 @@ export default function Register() {
           </form>
         ) : (
           /* Phone Registration Form */
-          <form onSubmit={onPhoneSubmit} className="space-y-4">
-            <div className="flex items-center gap-2.5 rounded-xl px-3.5 py-2 text-xs font-semibold bg-orange-500/10 border border-orange-400/35 text-orange-600">
+          <form onSubmit={onPhoneSubmit} className="space-y-3.5 sm:space-y-4">
+            {/* Compact Mobile Banner */}
+            <div className="flex items-center gap-2.5 rounded-xl p-3 text-xs font-semibold bg-orange-500/10 border border-orange-500/20 text-orange-700">
               <Sparkles className="h-4 w-4 shrink-0 text-orange-600 animate-pulse" />
-              <span>⚡ Instant 1-Click Setup — No Password or OTP Required!</span>
+              <div className="leading-tight">
+                <span className="font-bold">⚡ 1-Click Instant Setup</span>
+                <span className="block text-[11px] font-normal text-orange-600/90">
+                  No password or OTP required. Get instant access with phone.
+                </span>
+              </div>
             </div>
 
             <div className="space-y-1.5">
               <Label
                 htmlFor="phoneFullName"
-                className="text-xs uppercase font-semibold text-gray-600 tracking-wider flex items-center gap-1.5"
+                className="text-xs font-semibold text-gray-700 flex items-center gap-1.5"
               >
-                <User className="h-3.5 w-3.5 text-orange-600" /> Full Name
+                <User className="h-3.5 w-3.5 text-orange-500" /> Full Name
               </Label>
               <Input
                 id="phoneFullName"
                 type="text"
+                autoComplete="name"
+                autoCapitalize="words"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="e.g. Priya Sharma"
                 required
-                autoFocus
-                className="h-11 border-gray-200 bg-white/80 text-gray-900 focus-visible:ring-orange-500 rounded-xl"
+                className="h-12 border-gray-200 bg-white/90 text-base text-gray-900 placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-orange-500/20 focus-visible:border-orange-500 rounded-xl"
               />
             </div>
 
             <div className="space-y-1.5">
               <Label
                 htmlFor="phoneInput"
-                className="text-xs uppercase font-semibold text-gray-600 tracking-wider flex items-center gap-1.5"
+                className="text-xs font-semibold text-gray-700 flex items-center gap-1.5"
               >
-                <Phone className="h-3.5 w-3.5 text-orange-500" /> Mobile / Phone Number
+                <Phone className="h-3.5 w-3.5 text-orange-500" /> Mobile Number
               </Label>
-              <Input
-                id="phoneInput"
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="e.g. 8297458070"
-                required
-                className="h-11 border-gray-200 bg-white/80 text-gray-900 focus-visible:ring-orange-500 rounded-xl"
-              />
+              <div className="relative flex items-center">
+                <div className="absolute left-3 flex items-center gap-1 text-xs font-bold text-gray-500 pointer-events-none border-r border-gray-200 pr-2">
+                  <span>🇮🇳</span>
+                  <span>+91</span>
+                </div>
+                <Input
+                  id="phoneInput"
+                  type="tel"
+                  inputMode="tel"
+                  autoComplete="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="9876543210"
+                  required
+                  className="h-12 pl-20 border-gray-200 bg-white/90 text-base text-gray-900 placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-orange-500/20 focus-visible:border-orange-500 rounded-xl"
+                />
+              </div>
             </div>
 
             {error && (
-              <div className="rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-xs text-rose-700 font-medium">
-                {error}
+              <div className="flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50/90 p-3 text-xs text-rose-700 font-medium">
+                <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-rose-600" />
+                <span className="leading-snug">{error}</span>
               </div>
             )}
 
             <Button
               type="submit"
-              className="w-full h-11 text-xs uppercase tracking-wider font-bold gap-2 bg-orange-500 hover:bg-orange-600 text-white shadow-glow-primary rounded-xl"
+              className="w-full h-12 text-sm font-bold uppercase tracking-wider gap-2 bg-orange-500 hover:bg-orange-600 active:scale-[0.98] text-white shadow-glow-primary rounded-xl transition-all"
               disabled={submitting}
             >
               {submitting ? (
@@ -344,19 +369,20 @@ export default function Register() {
           </form>
         )}
 
-        {/* Footer Navigation */}
-        <div className="pt-2 border-t border-gray-100 text-center text-xs text-gray-500">
+        {/* Switch to Login */}
+        <div className="pt-3 border-t border-gray-100 text-center text-xs sm:text-sm text-gray-600">
           Already have an account?{" "}
           <Link
             to="/auth/login"
-            className="font-bold text-orange-600 hover:text-orange-700 hover:underline"
+            className="font-bold text-orange-600 hover:text-orange-700 hover:underline inline-block py-1"
           >
             Sign in
           </Link>
         </div>
 
-        <div className="text-center text-[11px] text-gray-400 flex items-center justify-center gap-1.5">
-          <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
+        {/* Security & Features Badge */}
+        <div className="text-center text-[11px] sm:text-xs text-gray-500 flex items-center justify-center gap-1.5">
+          <ShieldCheck className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
           <span>Free access • Instant setup • No credit card required.</span>
         </div>
       </div>

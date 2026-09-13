@@ -44,12 +44,12 @@ export function GoogleAuthButton({
       type="button"
       onClick={handleClick}
       disabled={loading}
-      className={`relative flex w-full items-center justify-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-900 active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed ${className}`}
+      className={`relative flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-gray-300/80 bg-white px-4 text-[14px] sm:text-[15px] font-semibold text-gray-800 shadow-xs transition-all duration-150 hover:bg-gray-50 hover:border-gray-400 active:scale-[0.98] active:bg-gray-100 disabled:opacity-60 disabled:cursor-not-allowed ${className}`}
     >
       {loading ? (
-        <Loader2 className="h-5 w-5 animate-spin text-orange-500" />
+        <Loader2 className="h-5 w-5 animate-spin text-orange-500 shrink-0" />
       ) : (
-        <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24">
+        <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
           <path
             fill="#4285F4"
             d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -68,7 +68,7 @@ export function GoogleAuthButton({
           />
         </svg>
       )}
-      <span>{loading ? "Connecting to Google..." : label}</span>
+      <span className="truncate">{loading ? "Connecting to Google…" : label}</span>
     </button>
   );
 }

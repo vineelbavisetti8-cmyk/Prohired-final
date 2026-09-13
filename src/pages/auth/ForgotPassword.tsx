@@ -21,7 +21,7 @@ export default function ForgotPassword() {
           </p>
         </div>
 
-        <Button asChild className="w-full h-11 gap-2 uppercase tracking-wider font-bold text-xs bg-orange-500 hover:bg-orange-500 text-white rounded-xl shadow-glow-primary">
+        <Button asChild className="w-full h-12 gap-2 uppercase tracking-wider font-bold text-xs bg-orange-500 hover:bg-orange-600 active:scale-[0.98] text-white rounded-xl shadow-glow-primary transition-all">
           <Link to="/auth/login">
             Go to Instant Sign In <ArrowRight className="h-4 w-4" />
           </Link>

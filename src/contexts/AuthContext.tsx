@@ -21,6 +21,7 @@ interface AuthContextValue {
   updateProfileName: (name: string) => Promise<void>;
   refreshProfile: () => Promise<void>;
   signOut: () => Promise<void>;
+  deleteAccount: () => Promise<{ success: boolean; error?: string }>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -393,6 +394,67 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (user) await fetchProfile(user.id);
   };
 
+  const deleteAccount = async (): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const currentUserId = user?.id;
+      if (currentUserId && isValidUuid(currentUserId)) {
+        try {
+          await supabase.from("resumes").delete().eq("user_id", currentUserId);
+        } catch (e) {
+          console.warn("Could not delete resumes during account deletion:", e);
+        }
+        try {
+          await supabase.from("interview_sessions").delete().eq("user_id", currentUserId);
+        } catch (e) {
+          console.warn("Could not delete interview sessions:", e);
+        }
+        try {
+          await supabase.from("profiles").delete().eq("id", currentUserId);
+        } catch (e) {
+          console.warn("Could not delete profile:", e);
+        }
+        try {
+          await (supabase as any).rpc("delete_user");
+        } catch {}
+      }
+
+      // Clear local storage phone user keys and plans
+      localStorage.removeItem(LOCAL_USER_KEY);
+      localStorage.removeItem("hirerapid_phone_user");
+      if (currentUserId) {
+        try {
+          const map = JSON.parse(localStorage.getItem(USER_PLANS_KEY) || "{}");
+          delete map[currentUserId];
+          localStorage.setItem(USER_PLANS_KEY, JSON.stringify(map));
+        } catch {}
+      }
+
+      // Remove cached user resume/analysis records
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const key = localStorage.key(i);
+        if (
+          key &&
+          (key.startsWith("prohired_") || key.startsWith("hirerapid_")) &&
+          key !== "prohired_splash_seen" &&
+          key !== "hirerapid_splash_seen"
+        ) {
+          localStorage.removeItem(key);
+        }
+      }
+
+      try {
+        await supabase.auth.signOut();
+      } catch {}
+
+      setUser(null);
+      setProfile(null);
+      return { success: true };
+    } catch (err: any) {
+      console.error("Account deletion error:", err);
+      return { success: false, error: err.message || "Failed to delete account. Please try again." };
+    }
+  };
+
   const signOut = async () => {
     localStorage.removeItem(LOCAL_USER_KEY);
     try {
@@ -421,6 +483,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         updateProfileName,
         refreshProfile,
         signOut,
+        deleteAccount,
       }}
     >
       {children}

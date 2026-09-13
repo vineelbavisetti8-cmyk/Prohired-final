@@ -77,8 +77,8 @@ export function Footer() {
             title="Company"
             links={[
               ["About", "#"],
-              ["Privacy", "#"],
-              ["Terms", "#"],
+              ["Privacy Policy", "/privacy"],
+              ["Account Deletion", "/account-deletion"],
             ]}
           />
           <FooterCol
@@ -86,6 +86,7 @@ export function Footer() {
             links={[
               ["Sign In", "/auth/login"],
               ["Create Account", "/auth/register"],
+              ["Account & Data Deletion", "/account-deletion"],
             ]}
           />
         </div>

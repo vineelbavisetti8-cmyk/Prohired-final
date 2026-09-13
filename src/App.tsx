@@ -20,6 +20,8 @@ import Profile from "./pages/app/Profile.tsx";
 import Jobs from "./pages/app/Jobs.tsx";
 import Interview from "./pages/app/Interview.tsx";
 import ResumeBuilder from "./pages/app/ResumeBuilder.tsx";
+import PrivacyPolicy from "./pages/legal/PrivacyPolicy.tsx";
+import AccountDeletion from "./pages/legal/AccountDeletion.tsx";
 import Index from "./pages/Index.tsx";
 
 // Admin Imports
@@ -82,7 +84,15 @@ const App = () => {
                 <Route path="app/job-feed" element={<Jobs />} />
                 <Route path="app/interview" element={<Interview />} />
                 <Route path="app/profile" element={<Profile />} />
+                <Route path="app/privacy" element={<PrivacyPolicy />} />
+                <Route path="app/delete-account" element={<AccountDeletion />} />
               </Route>
+
+              {/* Public Legal & Play Store compliance routes */}
+              <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/account-deletion" element={<AccountDeletion />} />
+              <Route path="/delete-account" element={<AccountDeletion />} />
 
               {/* Legacy Landing Page available at /landing */}
               <Route path="/landing" element={<Index />} />

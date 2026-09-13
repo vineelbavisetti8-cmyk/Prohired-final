@@ -19,6 +19,12 @@ import {
   UserPlus,
   Loader2,
   Lock,
+  FileText,
+  Trash2,
+  ChevronRight,
+  ShieldCheck,
+  AlertTriangle,
+  Download,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -30,6 +36,7 @@ const SUB_TABS: SubNavTab[] = [
   { id: "account", label: "My Account", icon: User },
   { id: "pro", label: "Membership & Plan", icon: Crown },
   { id: "settings", label: "Preferences", icon: Sparkles },
+  { id: "privacy", label: "Privacy & Legal", icon: Shield },
 ];
 
 export default function Profile() {
@@ -203,6 +210,61 @@ export default function Profile() {
                     </Button>
                   </div>
                 </div>
+
+                {/* Privacy, Security & Account Management */}
+                <div className="glass-card p-6 rounded-2xl space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-base font-bold text-foreground">Privacy, Data & Account Control</h3>
+                    <span className="text-[11px] text-muted-foreground font-semibold flex items-center gap-1">
+                      <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" /> Play Store Verified
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Manage your personal career records, read our data handling guidelines, or request full account deletion.
+                  </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                    <Link
+                      to="/app/privacy"
+                      className="p-4 rounded-xl border border-border bg-card/60 hover:bg-card/90 transition-all flex items-start gap-3 group"
+                    >
+                      <div className="h-9 w-9 rounded-lg bg-orange-500/10 text-orange-600 flex items-center justify-center shrink-0">
+                        <FileText className="h-4 w-4" />
+                      </div>
+                      <div className="space-y-0.5 min-w-0 flex-1">
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs font-bold text-foreground group-hover:text-orange-600 transition-colors">
+                            Privacy Policy
+                          </p>
+                          <ChevronRight className="h-3.5 w-3.5 text-muted-foreground group-hover:translate-x-0.5 transition-transform" />
+                        </div>
+                        <p className="text-[11px] text-muted-foreground line-clamp-2">
+                          How ProHired collects, encrypts, and processes your resume and interview data.
+                        </p>
+                      </div>
+                    </Link>
+
+                    <Link
+                      to="/app/delete-account"
+                      className="p-4 rounded-xl border border-rose-200/80 dark:border-rose-950/60 bg-rose-50/30 dark:bg-rose-950/10 hover:bg-rose-50/60 dark:hover:bg-rose-950/20 transition-all flex items-start gap-3 group"
+                    >
+                      <div className="h-9 w-9 rounded-lg bg-rose-500/10 text-rose-600 flex items-center justify-center shrink-0">
+                        <Trash2 className="h-4 w-4" />
+                      </div>
+                      <div className="space-y-0.5 min-w-0 flex-1">
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs font-bold text-rose-700 dark:text-rose-400 group-hover:underline">
+                            Delete Account & Data
+                          </p>
+                          <ChevronRight className="h-3.5 w-3.5 text-rose-500 group-hover:translate-x-0.5 transition-transform" />
+                        </div>
+                        <p className="text-[11px] text-rose-900/70 dark:text-rose-300/70 line-clamp-2">
+                          Permanently wipe your account, resumes, and mock interview scores.
+                        </p>
+                      </div>
+                    </Link>
+                  </div>
+                </div>
               </>
             ) : (
               /* Unauthenticated / Guest View with Sign In and Sign Up Options */
@@ -303,6 +365,16 @@ export default function Profile() {
                         Full Register Page →
                       </Link>
                     </div>
+
+                    <div className="flex justify-center gap-4 mt-3 pt-3 border-t border-border/40 text-[11px] text-muted-foreground">
+                      <Link to="/app/privacy" className="hover:text-foreground underline">
+                        Privacy Policy
+                      </Link>
+                      <span>•</span>
+                      <Link to="/app/delete-account" className="hover:text-rose-600 underline">
+                        Account Deletion Request
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -398,6 +470,31 @@ export default function Profile() {
               </div>
             </div>
 
+            {/* Legal & Privacy Links */}
+            <div className="glass-card p-6 rounded-2xl space-y-3">
+              <p className="text-xs font-bold text-gray-800">Legal & Data Policies</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                <Link
+                  to="/app/privacy"
+                  className="p-3 rounded-xl bg-gray-50/80 border border-gray-200 flex items-center justify-between hover:bg-gray-100/80 transition-colors"
+                >
+                  <span className="font-semibold text-gray-700 flex items-center gap-2">
+                    <FileText className="h-3.5 w-3.5 text-orange-600" /> Privacy Policy
+                  </span>
+                  <ChevronRight className="h-3.5 w-3.5 text-gray-400" />
+                </Link>
+                <Link
+                  to="/app/delete-account"
+                  className="p-3 rounded-xl bg-rose-50/50 border border-rose-200 flex items-center justify-between hover:bg-rose-50 transition-colors"
+                >
+                  <span className="font-semibold text-rose-700 flex items-center gap-2">
+                    <Trash2 className="h-3.5 w-3.5 text-rose-600" /> Account Deletion
+                  </span>
+                  <ChevronRight className="h-3.5 w-3.5 text-rose-400" />
+                </Link>
+              </div>
+            </div>
+
             {isAuthenticated && (
               <div className="glass-card p-6 rounded-2xl flex items-center justify-between">
                 <div>
@@ -414,6 +511,89 @@ export default function Profile() {
                 </Button>
               </div>
             )}
+          </div>
+        )}
+
+        {/* TAB 4: PRIVACY & LEGAL */}
+        {activeTab === "privacy" && (
+          <div className="space-y-6 animate-fade-in">
+            {/* Header banner */}
+            <div className="rounded-3xl border border-orange-400/40 bg-gradient-to-br from-orange-100/40 via-card to-background p-6 space-y-3">
+              <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                <ShieldCheck className="h-3.5 w-3.5" /> High Standards of Privacy & Data Protection
+              </div>
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground">
+                Your Privacy, Resumes & Data Sovereignty
+              </h2>
+              <p className="text-xs sm:text-sm text-muted-foreground max-w-xl leading-relaxed">
+                At ProHired, your uploaded career materials, ATS audit scores, and AI mock interview simulations
+                are stored with AES-256 encryption. We never sell your personal data or resumes to third parties.
+              </p>
+            </div>
+
+            {/* Quick action tiles */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Link
+                to="/app/privacy"
+                className="glass-card p-5 rounded-2xl hover:border-orange-500/50 transition-all flex flex-col justify-between group space-y-3"
+              >
+                <div className="space-y-2">
+                  <div className="h-10 w-10 rounded-xl bg-orange-500/10 text-orange-600 flex items-center justify-center">
+                    <FileText className="h-5 w-5" />
+                  </div>
+                  <h3 className="font-bold text-foreground text-sm group-hover:text-orange-600 transition-colors flex items-center justify-between">
+                    Official Privacy Policy
+                    <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+                  </h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Review our full legal privacy disclosures, AI processing safety boundaries, cookie policies, and Data Protection Officer contacts.
+                  </p>
+                </div>
+                <div className="pt-2 text-xs font-semibold text-orange-600 flex items-center gap-1">
+                  Read Full Policy →
+                </div>
+              </Link>
+
+              <Link
+                to="/app/delete-account"
+                className="glass-card p-5 rounded-2xl border-rose-200/80 dark:border-rose-950/60 hover:border-rose-500/50 transition-all flex flex-col justify-between group space-y-3"
+              >
+                <div className="space-y-2">
+                  <div className="h-10 w-10 rounded-xl bg-rose-500/10 text-rose-600 flex items-center justify-center">
+                    <Trash2 className="h-5 w-5" />
+                  </div>
+                  <h3 className="font-bold text-rose-700 dark:text-rose-400 text-sm flex items-center justify-between">
+                    Delete Account & Purge Data
+                    <ChevronRight className="h-4 w-4 text-rose-500 group-hover:translate-x-1 transition-transform" />
+                  </h3>
+                  <p className="text-xs text-rose-900/70 dark:text-rose-300/70 leading-relaxed">
+                    Initiate complete data erasure. Permanently purge your profile, resumes, interview records, and account credentials.
+                  </p>
+                </div>
+                <div className="pt-2 text-xs font-semibold text-rose-600 flex items-center gap-1">
+                  Request Permanent Deletion →
+                </div>
+              </Link>
+            </div>
+
+            {/* Compliance Guarantee */}
+            <div className="glass-card p-6 rounded-2xl space-y-3">
+              <h4 className="text-sm font-bold text-foreground">Play Store Data Safety Commitments</h4>
+              <div className="space-y-2 text-xs text-muted-foreground">
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span><strong>No Third-Party Sharing:</strong> Your resume is never sold to advertisers or headhunter brokers without explicit consent.</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span><strong>Secure AI Processing:</strong> Enterprise AI pipelines do not use your private resumes to train public LLMs.</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span><strong>User-Initiated Deletion:</strong> Instant self-service deletion option directly from this mobile app and via our public web portal.</span>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>

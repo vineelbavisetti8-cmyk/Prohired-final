@@ -4,6 +4,7 @@ dist/
 .env
 .env.local
 .env.*.local
+*.timestamp-*.mjs
 
 # Using Android gitignore template: https://github.com/github/gitignore/blob/HEAD/Android.gitignore
 

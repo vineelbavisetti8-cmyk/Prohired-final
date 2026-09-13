@@ -1,0 +1,1 @@
+export default function sortBy(arr, iter) { if (!arr) return []; const fn = typeof iter === 'function' ? iter : (x => x?.[iter]); return [...arr].sort((a, b) => { const va = fn(a), vb = fn(b); return va > vb ? 1 : va < vb ? -1 : 0; }); }

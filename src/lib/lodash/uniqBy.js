@@ -1,0 +1,1 @@
+export default function uniqBy(arr, iter) { if (!arr) return []; const fn = typeof iter === 'function' ? iter : (x => x?.[iter]); const seen = new Set(); const res = []; for (const item of arr) { const key = fn(item); if (!seen.has(key)) { seen.add(key); res.push(item); } } return res; }

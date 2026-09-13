@@ -31,6 +31,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import AppSubNav, { SubNavTab } from "@/components/app/AppSubNav";
+import { ProUpgradeDialog } from "@/components/ProGate";
 
 const SUB_TABS: SubNavTab[] = [
   { id: "account", label: "My Account", icon: User },
@@ -44,7 +45,6 @@ export default function Profile() {
     user,
     profile,
     isAuthenticated,
-    togglePlan,
     signInWithPhone,
     updateProfileName,
     signOut,
@@ -60,6 +60,7 @@ export default function Profile() {
 
   // Authenticated edit state
   const [fullName, setFullName] = useState(profile?.full_name || "");
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
   const isPro = profile?.plan === "pro";
 
   useEffect(() => {
@@ -157,13 +158,15 @@ export default function Profile() {
                   <div className="flex items-center gap-2 w-full sm:w-auto">
                     <Button
                       size="sm"
-                      onClick={togglePlan}
+                      onClick={() => {
+                        if (!isPro) setUpgradeOpen(true);
+                      }}
                       className={`flex-1 sm:flex-initial rounded-xl text-xs font-semibold ${isPro
-                        ? "bg-amber-100 text-amber-700 border border-amber-300 hover:bg-amber-100"
-                        : "bg-gradient-to-r from-amber-500 to-amber-600 text-gray-900 shadow-glow-amber"
+                        ? "bg-amber-100 text-amber-700 border border-amber-300 hover:bg-amber-100 cursor-default"
+                        : "bg-gradient-to-r from-amber-500 to-amber-600 text-gray-900 shadow-glow-amber hover:from-amber-400 hover:to-amber-500"
                         }`}
                     >
-                      {isPro ? "✓ Pro Member" : "Upgrade to Pro"}
+                      {isPro ? "✓ Pro Member Active" : "Upgrade to Pro (₹49/mo)"}
                     </Button>
 
                     <Button
@@ -405,13 +408,15 @@ export default function Profile() {
                 </div>
 
                 <Button
-                  onClick={togglePlan}
+                  onClick={() => {
+                    if (!isPro) setUpgradeOpen(true);
+                  }}
                   className={`rounded-xl text-xs font-bold shrink-0 ${isPro
-                    ? "bg-amber-100 text-amber-700 border border-amber-300 hover:bg-amber-100"
+                    ? "bg-amber-100 text-amber-700 border border-amber-300 hover:bg-amber-100 cursor-default"
                     : "bg-gradient-to-r from-amber-500 to-amber-600 text-gray-900 hover:from-amber-400 hover:to-amber-500 shadow-glow-amber"
                     }`}
                 >
-                  {isPro ? "✓ Pro Active (Click to toggle Free)" : "Switch to Pro"}
+                  {isPro ? "✓ Pro Member Active (₹49/mo)" : "Upgrade to Pro — ₹49/mo"}
                 </Button>
               </div>
             </div>
@@ -597,6 +602,8 @@ export default function Profile() {
           </div>
         )}
       </div>
+
+      <ProUpgradeDialog open={upgradeOpen} onOpenChange={setUpgradeOpen} feature="full pro features" />
     </div>
   );
 }

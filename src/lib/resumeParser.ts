@@ -1,9 +1,4 @@
-import mammoth from "mammoth";
-import * as pdfjsLib from "pdfjs-dist";
-// @ts-ignore - vite ?worker import
-import PdfWorker from "pdfjs-dist/build/pdf.worker.min.mjs?worker";
-
-pdfjsLib.GlobalWorkerOptions.workerPort = new PdfWorker();
+let pdfjsInitialized = false;
 
 export async function extractTextFromFile(file: File): Promise<string> {
   const ext = file.name.toLowerCase().split(".").pop();
@@ -14,6 +9,18 @@ export async function extractTextFromFile(file: File): Promise<string> {
 }
 
 async function extractPdf(file: File): Promise<string> {
+  const [pdfjsLib, workerModule] = await Promise.all([
+    import("pdfjs-dist"),
+    // @ts-ignore - vite ?worker import
+    import("pdfjs-dist/build/pdf.worker.min.mjs?worker"),
+  ]);
+
+  if (!pdfjsInitialized) {
+    const PdfWorker = workerModule.default;
+    pdfjsLib.GlobalWorkerOptions.workerPort = new PdfWorker();
+    pdfjsInitialized = true;
+  }
+
   const buf = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
   let text = "";
@@ -26,7 +33,9 @@ async function extractPdf(file: File): Promise<string> {
 }
 
 async function extractDocx(file: File): Promise<string> {
+  const { default: mammoth } = await import("mammoth");
   const buf = await file.arrayBuffer();
   const result = await mammoth.extractRawText({ arrayBuffer: buf });
   return result.value.trim();
 }
+

@@ -5,12 +5,16 @@ import path from "path";
 export default defineConfig({
   plugins: [react()],
   test: {
-    environment: "jsdom",
+    environment: "node",
     globals: true,
     setupFiles: ["./src/test/setup.ts"],
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
   },
   resolve: {
-    alias: { "@": path.resolve(__dirname, "./src") },
+    alias: [
+      { find: "@", replacement: path.resolve(__dirname, "./src") },
+      { find: /^lodash\/(.*)/, replacement: path.resolve(__dirname, "./src/lib/lodash/$1.js") },
+      { find: "lodash", replacement: path.resolve(__dirname, "./src/lib/lodash/index.js") },
+    ],
   },
 });

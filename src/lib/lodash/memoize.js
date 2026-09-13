@@ -1,0 +1,1 @@
+export default function memoize(fn) { const cache = new Map(); const memoized = function(...args) { const key = args[0]; if (cache.has(key)) return cache.get(key); const res = fn.apply(this, args); cache.set(key, res); return res; }; memoized.cache = cache; return memoized; }

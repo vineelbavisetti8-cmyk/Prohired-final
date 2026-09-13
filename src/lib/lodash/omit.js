@@ -1,0 +1,1 @@
+export default function omit(obj, keys) { if (!obj) return {}; const set = new Set(Array.isArray(keys) ? keys : [keys]); const res = {}; for (const k in obj) { if (!set.has(k) && Object.prototype.hasOwnProperty.call(obj, k)) res[k] = obj[k]; } return res; }

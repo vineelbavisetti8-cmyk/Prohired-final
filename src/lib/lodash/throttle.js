@@ -1,0 +1,1 @@
+export default function throttle(fn, wait = 0) { let timer = null; let lastArgs = null; return function(...args) { if (timer) { lastArgs = args; return; } fn.apply(this, args); timer = setTimeout(() => { timer = null; if (lastArgs) { fn.apply(this, lastArgs); lastArgs = null; } }, wait); }; }

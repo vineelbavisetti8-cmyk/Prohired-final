@@ -1,0 +1,1 @@
+export default function isEqual(a, b) { if (a === b) return true; if (!a || !b || typeof a !== 'object' || typeof b !== 'object') return false; try { return JSON.stringify(a) === JSON.stringify(b); } catch { return false; } }

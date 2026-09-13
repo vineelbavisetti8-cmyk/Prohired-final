@@ -1,0 +1,1 @@
+export default function range(start, end, step) { if (end === undefined) { end = start; start = 0; } step = step || (start < end ? 1 : -1); const length = Math.max(Math.ceil((end - start) / (step || 1)), 0); const result = Array(length); for (let i = 0; i < length; i++, start += step) { result[i] = start; } return result; }

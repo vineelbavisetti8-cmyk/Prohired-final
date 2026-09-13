@@ -24,6 +24,7 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import AppSubNav, { SubNavTab } from "@/components/app/AppSubNav";
+import { ProUpgradeDialog } from "@/components/ProGate";
 
 const SUB_TABS: SubNavTab[] = [
   { id: "overview", label: "Cockpit", icon: Target },
@@ -35,8 +36,9 @@ const SUB_TABS: SubNavTab[] = [
 
 export default function AppExplore() {
   const [activeTab, setActiveTab] = useState("overview");
-  const { profile, togglePlan, streakDays, aiCredits } = useAuth();
+  const { profile, streakDays, aiCredits } = useAuth();
   const navigate = useNavigate();
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
   const isPro = profile?.plan === "pro";
 
   const [resumes, setResumes] = useState<any[]>([]);
@@ -448,12 +450,11 @@ export default function AppExplore() {
 
                 <div className="pt-6">
                   <Button
-                    onClick={() => { if (isPro) togglePlan(); }}
                     variant="outline"
-                    disabled={!isPro}
-                    className="w-full rounded-xl border-gray-300 text-xs font-semibold"
+                    disabled
+                    className="w-full rounded-xl border-gray-300 text-xs font-semibold cursor-default"
                   >
-                    {!isPro ? "Current Plan" : "Switch to Free"}
+                    {!isPro ? "Current Active Plan" : "Basic Starter Tier"}
                   </Button>
                 </div>
               </div>
@@ -480,7 +481,7 @@ export default function AppExplore() {
                   </div>
 
                   <div className="text-3xl font-black text-foreground">
-                    ₹499 <span className="text-xs text-gray-500 font-normal">/ month</span>
+                    ₹49 <span className="text-xs text-gray-500 font-normal">/ month</span>
                   </div>
 
                   <ul className="space-y-2.5 text-xs text-gray-800">
@@ -501,14 +502,14 @@ export default function AppExplore() {
 
                 <div className="pt-6">
                   <Button
-                    onClick={() => { if (!isPro) togglePlan(); }}
+                    onClick={() => { if (!isPro) setUpgradeOpen(true); }}
                     className={`w-full rounded-xl text-xs font-bold ${
                       isPro
-                        ? "bg-amber-100 text-amber-700 border border-amber-300 hover:bg-amber-100"
+                        ? "bg-amber-100 text-amber-700 border border-amber-300 hover:bg-amber-100 cursor-default"
                         : "bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-gray-900 shadow-glow-amber"
                     }`}
                   >
-                    {isPro ? "✓ Pro Membership Active" : "Upgrade to Pro"}
+                    {isPro ? "✓ Pro Membership Active" : "Upgrade to Pro (₹49/mo)"}
                   </Button>
                 </div>
               </div>
@@ -554,6 +555,8 @@ export default function AppExplore() {
           </div>
         )}
       </div>
+
+      <ProUpgradeDialog open={upgradeOpen} onOpenChange={setUpgradeOpen} feature="full pro features" />
     </div>
   );
 }

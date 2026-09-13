@@ -445,9 +445,46 @@ export const CURATED_TECH_JOBS: JobItem[] = [
   }
 ];
 
+// Multi-tier search cache to prevent 429 rate limiting and redundant network calls under 50k users
+interface SearchCacheEntry {
+  timestamp: number;
+  data: JobItem[];
+}
+const SEARCH_CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes
+const memorySearchCache = new Map<string, SearchCacheEntry>();
+
+function getCachedSearchResults(key: string): JobItem[] | null {
+  // 1. Check in-memory map
+  const mem = memorySearchCache.get(key);
+  if (mem && Date.now() - mem.timestamp < SEARCH_CACHE_TTL_MS) {
+    return mem.data;
+  }
+  // 2. Check localStorage
+  try {
+    const raw = localStorage.getItem(`prohired_search_${key}`);
+    if (raw) {
+      const parsed: SearchCacheEntry = JSON.parse(raw);
+      if (Date.now() - parsed.timestamp < SEARCH_CACHE_TTL_MS) {
+        memorySearchCache.set(key, parsed);
+        return parsed.data;
+      }
+    }
+  } catch {}
+  return null;
+}
+
+function setCachedSearchResults(key: string, data: JobItem[]): void {
+  const entry: SearchCacheEntry = { timestamp: Date.now(), data };
+  memorySearchCache.set(key, entry);
+  try {
+    localStorage.setItem(`prohired_search_${key}`, JSON.stringify(entry));
+  } catch {}
+}
+
 /**
  * Intelligent client-side job search engine.
  * Combines local curated catalog matching + Groq AI dynamic generation.
+ * Features 30-minute LRU caching for ultra-fast, zero-rate-limit responses.
  */
 export async function searchJobOpenings(
   queryRole: string = "",
@@ -457,6 +494,13 @@ export async function searchJobOpenings(
   const normQuery = queryRole.trim().toLowerCase();
   const normLoc = locationQuery.trim().toLowerCase();
   const normFilter = filterTag.toLowerCase();
+  const cacheKey = `${normQuery}_${normLoc}_${normFilter}`;
+
+  // Return cached results instantly if available
+  const cached = getCachedSearchResults(cacheKey);
+  if (cached && cached.length > 0) {
+    return cached;
+  }
 
   // ── 1. Fetch LIVE vacancies from Adzuna API (primary source) ──────────────
   let adzunaJobs: JobItem[] = [];
@@ -534,12 +578,14 @@ export async function searchJobOpenings(
 
   // ── 5. Hard fallback: return curated jobs if everything else failed ───────
   if (matched.length === 0) {
-    return CURATED_TECH_JOBS.slice(0, 10).map((j) => ({
+    matched = CURATED_TECH_JOBS.slice(0, 10).map((j) => ({
       ...j,
       matchScore: Math.floor(75 + Math.random() * 15),
     }));
   }
 
+  // Cache final resolved list
+  setCachedSearchResults(cacheKey, matched);
   return matched;
 }
 

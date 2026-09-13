@@ -1,0 +1,1 @@
+export default function minBy(arr, iter) { if (!arr || !arr.length) return undefined; const fn = typeof iter === 'function' ? iter : (x => x?.[iter]); let minVal = Infinity; let minItem = undefined; for (const item of arr) { const val = fn(item); if (val != null && val < minVal) { minVal = val; minItem = item; } } return minItem; }

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   Briefcase,
   Search,
@@ -23,8 +23,10 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import AppSubNav, { SubNavTab } from "@/components/app/AppSubNav";
 import { JobItem, searchJobOpenings, CURATED_TECH_JOBS } from "@/lib/jobSearchService";
+import JobFeed from "./JobFeed.tsx";
 
 const SUB_TABS: SubNavTab[] = [
+  { id: "feed", label: "Daily ATS Feed", icon: Sparkles, badge: "Daily 8 AM" },
   { id: "search", label: "Job Search & Openings", icon: Search },
   { id: "saved", label: "Saved Jobs", icon: Bookmark },
   { id: "applied", label: "Applied Tracker", icon: CheckCircle2 },
@@ -43,7 +45,9 @@ const FILTER_TAGS = [
 
 export default function Jobs() {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState("search");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialTab = searchParams.get("tab") || "feed";
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [searchQuery, setSearchQuery] = useState("");
   const [locationQuery, setLocationQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
@@ -171,6 +175,7 @@ export default function Jobs() {
   const isJobApplied = (id: string) => appliedJobsList.some((j) => j.id === id);
 
   const tabsWithCounts: SubNavTab[] = [
+    { id: "feed", label: "Daily ATS Feed", icon: Sparkles, badge: "Daily" },
     { id: "search", label: "Job Search & Openings", icon: Search, badge: jobs.length },
     { id: "saved", label: "Saved Jobs", icon: Bookmark, badge: savedJobsList.length },
     { id: "applied", label: "Applied Tracker", icon: CheckCircle2, badge: appliedJobsList.length },
@@ -182,10 +187,20 @@ export default function Jobs() {
       <AppSubNav
         tabs={tabsWithCounts}
         activeTab={activeTab}
-        onChange={setActiveTab}
+        onChange={(tab) => {
+          setActiveTab(tab);
+          setSearchParams({ tab });
+        }}
       />
 
       <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 py-5 sm:py-8 space-y-6">
+        {/* TAB 0: PERSONALIZED DAILY ATS FEED */}
+        {activeTab === "feed" && (
+          <div className="animate-fade-in">
+            <JobFeed />
+          </div>
+        )}
+
         {/* TAB 1: JOB SEARCH & OPENINGS */}
         {activeTab === "search" && (
           <div className="space-y-5 animate-fade-in">

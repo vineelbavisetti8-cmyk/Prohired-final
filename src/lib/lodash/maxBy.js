@@ -1,0 +1,1 @@
+export default function maxBy(arr, iter) { if (!arr || !arr.length) return undefined; const fn = typeof iter === 'function' ? iter : (x => x?.[iter]); let maxVal = -Infinity; let maxItem = undefined; for (const item of arr) { const val = fn(item); if (val != null && val > maxVal) { maxVal = val; maxItem = item; } } return maxItem; }

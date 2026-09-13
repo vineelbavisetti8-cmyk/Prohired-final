@@ -45,8 +45,8 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    // ₹19 = 1900 paise (launch offer pricing)
-    const amount = 1900;
+    // ₹49 = 4900 paise (Pro Monthly membership)
+    const amount = 4900;
     const receipt = `pro_${user.id.slice(0, 8)}_${Date.now()}`;
 
     const basicAuth = btoa(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`);

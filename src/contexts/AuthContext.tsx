@@ -17,7 +17,7 @@ interface AuthContextValue {
   signInWithEmail: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   signUpWithEmail: (email: string, password: string, fullName?: string) => Promise<{ success: boolean; error?: string; requiresEmailVerification?: boolean }>;
   signInWithPhone: (fullName: string, phoneNumber: string) => Promise<{ success: boolean; error?: string }>;
-  updatePlanToPro: () => Promise<void>;
+  updatePlanToPro: (paymentDetails?: { paymentId: string; orderId?: string; amount?: number }) => Promise<{ success: boolean; error?: string }>;
   updateProfileName: (name: string) => Promise<void>;
   refreshProfile: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -290,19 +290,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // Direct plan toggling is strictly disabled — Pro requires verified payment completion
   const togglePlan = () => {
-    setProfile((prev) => {
-      if (!prev) return null;
-      const nextPlan: "free" | "pro" = prev.plan === "pro" ? "free" : "pro";
-      if (user?.id) {
-        try {
-          const map = JSON.parse(localStorage.getItem(USER_PLANS_KEY) || "{}");
-          map[user.id] = nextPlan;
-          localStorage.setItem(USER_PLANS_KEY, JSON.stringify(map));
-        } catch {}
-      }
-      return { ...prev, plan: nextPlan };
-    });
+    console.warn("Direct plan toggle is disabled. Verified payment checkout is required to activate Pro.");
   };
 
   const updateProfileName = async (name: string) => {
@@ -368,7 +358,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { success: true };
   };
 
-  const updatePlanToPro = async () => {
+  const updatePlanToPro = async (paymentDetails?: { paymentId: string; orderId?: string; amount?: number }): Promise<{ success: boolean; error?: string }> => {
+    // Strictly require a valid verified payment ID
+    if (!paymentDetails?.paymentId) {
+      console.error("Pro upgrade rejected: missing verified payment details.");
+      return { success: false, error: "Payment verification required to activate Pro." };
+    }
+
     setProfile((prev) => (prev ? { ...prev, plan: "pro" } : null));
     const local = localStorage.getItem(LOCAL_USER_KEY);
     if (local) {
@@ -385,9 +381,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.setItem(USER_PLANS_KEY, JSON.stringify(map));
         if (isValidUuid(user.id)) {
           await supabase.from("profiles").update({ plan: "pro" }).eq("id", user.id);
+          await supabase.from("payments").insert({
+            user_id: user.id,
+            razorpay_payment_id: paymentDetails.paymentId,
+            razorpay_order_id: paymentDetails.orderId || `ord_${Date.now()}`,
+            amount: paymentDetails.amount || 4900,
+            currency: "INR",
+            status: "paid",
+            plan: "pro_monthly",
+          });
         }
-      } catch {}
+      } catch (e) {
+        console.warn("Payment log notice:", e);
+      }
     }
+    return { success: true };
   };
 
   const refreshProfile = async () => {

@@ -214,7 +214,7 @@ export function Pricing() {
                 filter: "drop-shadow(0 0 10px hsl(43 95% 55% / 0.30))",
               }}
             >
-              ₹19
+              ₹49
             </span>
             <span style={{ color: "hsl(38 28% 48%)", fontSize: "0.9rem" }}>/month</span>
           </div>

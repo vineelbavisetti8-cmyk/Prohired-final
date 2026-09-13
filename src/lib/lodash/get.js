@@ -1,0 +1,1 @@
+export default function get(obj, path, def) { if (!obj) return def; const keys = Array.isArray(path) ? path : String(path).replace(/\[(\d+)\]/g, '.$1').split('.'); let cur = obj; for (const k of keys) { if (cur == null) return def; cur = cur[k]; } return cur === undefined ? def : cur; }

@@ -18,14 +18,16 @@ import {
   FileText,
   Briefcase,
   MessageSquare,
+  Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
+import { ProUpgradeDialog } from "@/components/ProGate";
 import logo from "@/assets/prohired-logo.png";
 
-const DESKTOP_NAV = [
-  { to: "/app/explore", label: "Explore", icon: Compass },
-  { to: "/app/resume/upload", label: "Resume Studio", icon: FileText },
+const NAV_ITEMS = [
+  { to: "/app/explore", label: "Cockpit", icon: Compass },
+  { to: "/app/resume/upload", label: "ATS Studio", icon: Sparkles },
   { to: "/app/jobs", label: "Jobs", icon: Briefcase },
   { to: "/app/interview", label: "Interview", icon: MessageSquare },
   { to: "/app/profile", label: "Account", icon: User },
@@ -39,11 +41,12 @@ interface AppHeaderProps {
 }
 
 export default function AppHeader({ deviceMode, setDeviceMode, onOpenSearch, hideDeviceSwitcher }: AppHeaderProps) {
-  const { profile, isAuthenticated, togglePlan, signOut } = useAuth();
+  const { profile, isAuthenticated, signOut } = useAuth();
   const location = useLocation();
 
   const [notifOpen, setNotifOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
 
   // Derive active title based on path
   const getScreenTitle = () => {
@@ -260,17 +263,27 @@ export default function AppHeader({ deviceMode, setDeviceMode, onOpenSearch, hid
                   </div>
 
                   <div className="pt-2 space-y-1">
-                    <button
-                      onClick={() => {
-                        togglePlan();
-                        setProfileOpen(false);
-                      }}
-                      className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-semibold text-amber-700 hover:bg-amber-50 transition-colors"
-                    >
-                      <span className="flex items-center gap-1.5">
-                        <Crown className="h-3.5 w-3.5" /> Toggle {isPro ? "Free" : "Pro"} Plan
-                      </span>
-                    </button>
+                    {isPro ? (
+                      <div className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-semibold text-amber-700 bg-amber-50">
+                        <span className="flex items-center gap-1.5">
+                          <Crown className="h-3.5 w-3.5 text-amber-600" /> Pro Member Active
+                        </span>
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-200/60 text-amber-800">₹49/mo</span>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          setProfileOpen(false);
+                          setUpgradeOpen(true);
+                        }}
+                        className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-semibold text-amber-700 hover:bg-amber-50 transition-colors"
+                      >
+                        <span className="flex items-center gap-1.5">
+                          <Crown className="h-3.5 w-3.5" /> Upgrade to Pro
+                        </span>
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">₹49/mo</span>
+                      </button>
+                    )}
 
                     <Link
                       to="/app/profile"
@@ -323,6 +336,8 @@ export default function AppHeader({ deviceMode, setDeviceMode, onOpenSearch, hid
           )}
         </div>
       </div>
+
+      <ProUpgradeDialog open={upgradeOpen} onOpenChange={setUpgradeOpen} feature="full pro features" />
     </header>
   );
 }
